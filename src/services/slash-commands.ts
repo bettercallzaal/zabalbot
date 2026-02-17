@@ -2,8 +2,11 @@ import type { IAgentRuntime } from '@elizaos/core';
 import { Service, logger } from '@elizaos/core';
 import { TOKENS } from '../constants.ts';
 import { fetchTokenData, formatTokenResponse } from '../api/dexscreener.ts';
-import { fetchEmpireData, formatEmpireResponse } from '../api/empire.ts';
+import { fetchEmpireData, formatEmpireResponse, fetchEmpireLeaderboard } from '../api/empire.ts';
+import { fetchFarcasterRecapData } from '../api/farcaster.ts';
 import { getActivitySince } from '../tracker.ts';
+import { formatRecap } from '../formatters/recap-formatter.ts';
+import { formatActive } from '../formatters/active-formatter.ts';
 
 const SLASH_COMMANDS = [
   {
@@ -121,77 +124,24 @@ async function handleSlashCommand(interaction: any): Promise<void> {
 
       case 'recap': {
         const hours = interaction.options?.getInteger('hours') ?? 24;
-        const activity = getActivitySince(hours);
 
-        if (activity.totalMessages === 0) {
-          responseText = `No activity tracked in the last ${hours} hour${hours > 1 ? 's' : ''}. I silently observe messages in the background — the longer I run, the richer the recaps get.`;
-          break;
-        }
+        const [discord, farcaster, leaderboard] = await Promise.all([
+          Promise.resolve(getActivitySince(hours)),
+          fetchFarcasterRecapData(),
+          fetchEmpireLeaderboard(5),
+        ]);
 
-        const lines: string[] = [];
-        lines.push(`**Community Recap — Last ${hours}h**`);
-        lines.push(`Total messages tracked: ${activity.totalMessages}`);
-        lines.push('');
-
-        const sortedContributors = [...activity.contributors.entries()]
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 10);
-        if (sortedContributors.length > 0) {
-          lines.push('**Active Contributors:**');
-          for (const [name, count] of sortedContributors) {
-            lines.push(`  - ${name}: ${count} message${count > 1 ? 's' : ''}`);
-          }
-          lines.push('');
-        }
-
-        if (activity.topTopics.length > 0) {
-          lines.push('**Trending Topics:**');
-          for (const [topic, count] of activity.topTopics) {
-            lines.push(`  - ${topic}: ${count} mention${count > 1 ? 's' : ''}`);
-          }
-          lines.push('');
-        }
-
-        const uniqueLinks = [...new Set(activity.links)].slice(0, 5);
-        if (uniqueLinks.length > 0) {
-          lines.push('**Links Shared:**');
-          for (const link of uniqueLinks) {
-            lines.push(`  - ${link}`);
-          }
-          lines.push('');
-        }
-
-        lines.push('*I track activity silently in the background. The longer I run, the richer these recaps get.*');
-        responseText = lines.join('\n');
+        responseText = formatRecap(hours, { discord, farcaster, leaderboard });
         break;
       }
 
       case 'active': {
-        const activity = getActivitySince(24);
+        const [discord, farcaster] = await Promise.all([
+          Promise.resolve(getActivitySince(24)),
+          fetchFarcasterRecapData(),
+        ]);
 
-        if (activity.contributors.size === 0) {
-          responseText = "No activity tracked yet. I silently observe messages in the background — give it some time and I'll have contributor data for you.";
-          break;
-        }
-
-        const sorted = [...activity.contributors.entries()]
-          .sort((a, b) => b[1] - a[1])
-          .slice(0, 15);
-
-        const lines: string[] = [];
-        lines.push('**Community Pulse — Last 24h**');
-        lines.push(`${activity.contributors.size} unique contributors, ${activity.totalMessages} total messages`);
-        lines.push('');
-
-        for (let i = 0; i < sorted.length; i++) {
-          const [name, count] = sorted[i];
-          lines.push(`${i + 1}. **${name}** — ${count} message${count > 1 ? 's' : ''}`);
-        }
-
-        if (activity.contributors.size > 15) {
-          lines.push(`  ...and ${activity.contributors.size - 15} more`);
-        }
-        responseText = lines.join('\n');
+        responseText = formatActive({ discord, farcaster });
         break;
       }
 

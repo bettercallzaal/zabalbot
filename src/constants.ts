@@ -20,11 +20,17 @@ export const TOPIC_KEYWORDS = [
   'builder', 'hackathon', 'coordination', 'onchain', 'defi',
 ];
 
+// Farcaster search terms for ecosystem mentions
+export const FARCASTER_SEARCH_TERMS = ['zabal', 'sang', 'songjam'] as const;
+
 // Cache TTLs (milliseconds)
 export const CACHE_TTL = {
-  DEXSCREENER: 60_000,    // 1 minute
-  EMPIRE: 120_000,        // 2 minutes
-  FARCASTER: 300_000,     // 5 minutes
+  DEXSCREENER: 60_000,          // 1 minute
+  EMPIRE: 120_000,              // 2 minutes
+  FARCASTER: 300_000,           // 5 minutes
+  FARCASTER_CHANNEL: 300_000,   // 5 minutes
+  EMPIRE_LEADERBOARD: 300_000,  // 5 minutes
+  EMPIRE_BOOSTERS: 600_000,     // 10 minutes
 } as const;
 
 // Activity tracker limits

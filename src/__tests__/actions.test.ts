@@ -103,14 +103,16 @@ describe('COMMUNITY_RECAP Action', () => {
     expect(await action.validate(mockRuntime, msg, mockState)).toBe(false);
   });
 
-  it('handler returns empty state message when no activity', async () => {
+  it('handler returns recap response when called', async () => {
     const msg = createMockMessage('recap');
     let callbackText = '';
     const callback: HandlerCallback = async (response: any) => {
       callbackText = response.text;
     };
     await action.handler(mockRuntime, msg, mockState, {}, callback, []);
-    expect(callbackText).toContain('No activity tracked');
+    // With Farcaster/Empire data available, should return a recap (not necessarily empty)
+    expect(callbackText.length).toBeGreaterThan(0);
+    expect(callbackText).toContain('Recap');
   });
 });
 
@@ -139,13 +141,15 @@ describe('WHO_ACTIVE Action', () => {
     expect(await action.validate(mockRuntime, msg, mockState)).toBe(false);
   });
 
-  it('handler returns empty state message when no activity', async () => {
+  it('handler returns pulse response when called', async () => {
     const msg = createMockMessage("Who's active?");
     let callbackText = '';
     const callback: HandlerCallback = async (response: any) => {
       callbackText = response.text;
     };
     await action.handler(mockRuntime, msg, mockState, {}, callback, []);
-    expect(callbackText).toContain('No activity tracked');
+    // With Farcaster data available, should return a pulse (not necessarily empty)
+    expect(callbackText.length).toBeGreaterThan(0);
+    expect(callbackText).toContain('Pulse');
   });
 });

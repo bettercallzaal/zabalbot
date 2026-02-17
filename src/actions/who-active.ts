@@ -1,6 +1,8 @@
 import type { Action, HandlerCallback, IAgentRuntime, Memory, State } from '@elizaos/core';
 import { logger } from '@elizaos/core';
 import { getActivitySince } from '../tracker.ts';
+import { fetchFarcasterRecapData } from '../api/farcaster.ts';
+import { formatActive } from '../formatters/active-formatter.ts';
 
 export const whoActiveAction: Action = {
   name: 'WHO_ACTIVE',
@@ -32,37 +34,15 @@ export const whoActiveAction: Action = {
     _responses: Memory[]
   ) => {
     try {
-      const activity = getActivitySince(24);
+      const [discord, farcaster] = await Promise.all([
+        Promise.resolve(getActivitySince(24)),
+        fetchFarcasterRecapData(),
+      ]);
 
-      if (activity.contributors.size === 0) {
-        await callback({
-          text: 'No activity tracked yet. I silently observe messages in the background — give it some time and I\'ll have contributor data for you.',
-          actions: ['WHO_ACTIVE'],
-          source: message.content.source,
-        });
-        return;
-      }
-
-      const sorted = [...activity.contributors.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 15);
-
-      const lines: string[] = [];
-      lines.push('**Community Pulse — Last 24h**');
-      lines.push(`${activity.contributors.size} unique contributors, ${activity.totalMessages} total messages`);
-      lines.push('');
-
-      for (let i = 0; i < sorted.length; i++) {
-        const [name, count] = sorted[i];
-        lines.push(`${i + 1}. **${name}** — ${count} message${count > 1 ? 's' : ''}`);
-      }
-
-      if (activity.contributors.size > 15) {
-        lines.push(`  ...and ${activity.contributors.size - 15} more`);
-      }
+      const text = formatActive({ discord, farcaster });
 
       await callback({
-        text: lines.join('\n'),
+        text,
         actions: ['WHO_ACTIVE'],
         source: message.content.source,
       });
@@ -78,7 +58,7 @@ export const whoActiveAction: Action = {
       {
         name: '{{name2}}',
         content: {
-          text: '**Community Pulse — Last 24h**\n5 unique contributors, 34 total messages\n\n1. **alice** — 12 messages\n2. **bob** — 8 messages\n3. **charlie** — 6 messages',
+          text: '**Community Pulse — Last 24h**\n\n**Discord** — 5 contributors, 34 messages\n1. **alice** — 12 messages\n2. **bob** — 8 messages\n\n**Farcaster** — 3 casters, 10 casts\n1. **@zabal** — 4 casts',
           actions: ['WHO_ACTIVE'],
         },
       },

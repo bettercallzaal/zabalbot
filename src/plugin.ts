@@ -34,6 +34,11 @@ const plugin: Plugin = {
     } else {
       logger.info('Farcaster social context: disabled (no NEYNAR API key)');
     }
+    if (process.env.EMPIRE_BUILDER_API_KEY) {
+      logger.info('Empire Builder API: authenticated');
+    } else {
+      logger.info('Empire Builder API: unauthenticated (no API key)');
+    }
   },
 
   actions: [tokenInfoAction, empireInfoAction, recapAction, whoActiveAction],

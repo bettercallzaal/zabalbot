@@ -1,6 +1,9 @@
 import type { Action, HandlerCallback, IAgentRuntime, Memory, State } from '@elizaos/core';
 import { logger } from '@elizaos/core';
 import { getActivitySince } from '../tracker.ts';
+import { fetchFarcasterRecapData } from '../api/farcaster.ts';
+import { fetchEmpireLeaderboard } from '../api/empire.ts';
+import { formatRecap } from '../formatters/recap-formatter.ts';
 
 function parseHoursFromText(text: string): number {
   const lower = text.toLowerCase();
@@ -42,65 +45,17 @@ export const recapAction: Action = {
   ) => {
     try {
       const hours = parseHoursFromText(message.content?.text ?? '');
-      const activity = getActivitySince(hours);
 
-      if (activity.totalMessages === 0) {
-        await callback({
-          text: `No activity tracked in the last ${hours} hour${hours > 1 ? 's' : ''}. I silently observe messages in the background — the longer I run, the richer the recaps get.`,
-          actions: ['COMMUNITY_RECAP'],
-          source: message.content.source,
-        });
-        return;
-      }
+      const [discord, farcaster, leaderboard] = await Promise.all([
+        Promise.resolve(getActivitySince(hours)),
+        fetchFarcasterRecapData(),
+        fetchEmpireLeaderboard(5),
+      ]);
 
-      const lines: string[] = [];
-      lines.push(`**Community Recap — Last ${hours}h**`);
-      lines.push(`Total messages tracked: ${activity.totalMessages}`);
-      lines.push('');
-
-      const sortedContributors = [...activity.contributors.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 10);
-      if (sortedContributors.length > 0) {
-        lines.push('**Active Contributors:**');
-        for (const [name, count] of sortedContributors) {
-          lines.push(`  - ${name}: ${count} message${count > 1 ? 's' : ''}`);
-        }
-        lines.push('');
-      }
-
-      if (activity.topTopics.length > 0) {
-        lines.push('**Trending Topics:**');
-        for (const [topic, count] of activity.topTopics) {
-          lines.push(`  - ${topic}: ${count} mention${count > 1 ? 's' : ''}`);
-        }
-        lines.push('');
-      }
-
-      const uniqueLinks = [...new Set(activity.links)].slice(0, 5);
-      if (uniqueLinks.length > 0) {
-        lines.push('**Links Shared:**');
-        for (const link of uniqueLinks) {
-          lines.push(`  - ${link}`);
-        }
-        lines.push('');
-      }
-
-      const sortedChannels = [...activity.channelBreakdown.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-      if (sortedChannels.length > 1) {
-        lines.push('**Channel Activity:**');
-        for (const [channelId, count] of sortedChannels) {
-          lines.push(`  - <#${channelId}>: ${count} messages`);
-        }
-        lines.push('');
-      }
-
-      lines.push('*I track activity silently in the background. The longer I run, the richer these recaps get.*');
+      const text = formatRecap(hours, { discord, farcaster, leaderboard });
 
       await callback({
-        text: lines.join('\n'),
+        text,
         actions: ['COMMUNITY_RECAP'],
         source: message.content.source,
       });
@@ -116,7 +71,7 @@ export const recapAction: Action = {
       {
         name: '{{name2}}',
         content: {
-          text: '**Community Recap — Last 24h**\nTotal messages tracked: 47\n\n**Active Contributors:**\n  - alice: 12 messages\n  - bob: 8 messages\n\n**Trending Topics:**\n  - zabal: 15 mentions\n  - music: 8 mentions',
+          text: '**Community Recap — Last 24h**\n\n**Discord Activity** — 47 messages\nTop contributors:\n  - alice: 12 messages\n  - bob: 8 messages\n\n**Farcaster Mentions** — 15 casts found\nActive casters:\n  - @zabal: 5 casts',
           actions: ['COMMUNITY_RECAP'],
         },
       },
@@ -126,7 +81,7 @@ export const recapAction: Action = {
       {
         name: '{{name2}}',
         content: {
-          text: '**Community Recap — Last 24h**\nTotal messages tracked: 23\n\n**Active Contributors:**\n  - charlie: 9 messages\n\n**Trending Topics:**\n  - governance: 5 mentions',
+          text: '**Community Recap — Last 24h**\n\n**Farcaster Mentions** — 8 casts found\nActive casters:\n  - @songjam: 3 casts\n\n*Discord tracking builds over time — the longer I run, the richer the Discord data.*',
           actions: ['COMMUNITY_RECAP'],
         },
       },
