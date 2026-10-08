@@ -24,15 +24,6 @@ describe('TOKEN_INFO Action', () => {
     expect(await action.validate(mockRuntime, msg, mockState)).toBe(true);
   });
 
-  it('validates on SANG token query', async () => {
-    const msg = createMockMessage('How is SANG trading?');
-    expect(await action.validate(mockRuntime, msg, mockState)).toBe(true);
-  });
-
-  it('validates on SongJam market query', async () => {
-    const msg = createMockMessage("What's the songjam market cap?");
-    expect(await action.validate(mockRuntime, msg, mockState)).toBe(true);
-  });
 
   it('rejects unrelated messages', async () => {
     const msg = createMockMessage('Tell me a joke');
@@ -48,9 +39,7 @@ describe('TOKEN_INFO Action', () => {
 describe('detectToken', () => {
   it('detects ZABAL', () => expect(detectToken('zabal price')).toBe('ZABAL'));
   it('detects $ZABAL', () => expect(detectToken('$ZABAL')).toBe('ZABAL'));
-  it('detects SANG', () => expect(detectToken('sang trading')).toBe('SANG'));
-  it('detects $SANG', () => expect(detectToken('$SANG')).toBe('SANG'));
-  it('detects songjam as SANG', () => expect(detectToken('songjam')).toBe('SANG'));
+  it('detects only ZABAL as a supported token', () => expect(detectToken('eth price')).toBeNull());
   it('returns null for unknown', () => expect(detectToken('bitcoin')).toBeNull());
 });
 

@@ -26,7 +26,7 @@ const plugin: Plugin = {
 
   async init(_config: Record<string, string>) {
     logger.info('*** Initializing ZABAL plugin ***');
-    logger.info('Token tracking: $ZABAL and $SANG on Base');
+    logger.info('Token tracking: $ZABAL on Base');
     logger.info('Activity tracker: enabled (silent observation)');
     logger.info('Community recap: enabled (@ZABAL recap)');
     if (process.env.FARCASTER_NEYNAR_API_KEY) {

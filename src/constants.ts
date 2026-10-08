@@ -5,23 +5,18 @@ export const TOKENS: Record<string, { address: string; name: string; symbol: str
     name: 'ZABAL',
     symbol: '$ZABAL',
   },
-  SANG: {
-    address: '0x4FF4d349CAa028BD069bbE85fA05253f96176741',
-    name: 'SANG',
-    symbol: '$SANG',
-  },
 };
 
 // Ecosystem keywords tracked for topic analysis
 export const TOPIC_KEYWORDS = [
-  'zabal', 'sang', 'songjam', 'wavewarz', 'clanker', 'empire',
+  'zabal', 'wavewarz', 'clanker', 'empire',
   'farcaster', 'base', 'ethereum', 'eth', 'fractal', 'incented',
   'governance', 'music', 'nft', 'token', 'dao', 'zao', 'virtuals',
   'builder', 'hackathon', 'coordination', 'onchain', 'defi',
 ];
 
 // Farcaster search terms for ecosystem mentions
-export const FARCASTER_SEARCH_TERMS = ['zabal', 'sang', 'songjam'] as const;
+export const FARCASTER_SEARCH_TERMS = ['zabal'] as const;
 
 // Cache TTLs (milliseconds)
 export const CACHE_TTL = {

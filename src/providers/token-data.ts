@@ -5,7 +5,7 @@ import { fetchTokenData } from '../api/dexscreener.ts';
 
 export const tokenDataProvider: Provider = {
   name: 'TOKEN_DATA_PROVIDER',
-  description: 'Provides live ZABAL and SANG token data as background context for all responses',
+  description: 'Provides live ZABAL token data as background context for all responses',
 
   get: async (
     _runtime: IAgentRuntime,
@@ -13,10 +13,7 @@ export const tokenDataProvider: Provider = {
     _state: State
   ): Promise<ProviderResult> => {
     try {
-      const [zabalPair, sangPair] = await Promise.all([
-        fetchTokenData(TOKENS.ZABAL.address),
-        fetchTokenData(TOKENS.SANG.address),
-      ]);
+      const zabalPair = await fetchTokenData(TOKENS.ZABAL.address);
 
       const lines: string[] = ['Current token data (live from DexScreener):'];
 
@@ -28,15 +25,7 @@ export const tokenDataProvider: Provider = {
         );
       }
 
-      if (sangPair) {
-        const sPrice = parseFloat(sangPair.priceUsd);
-        const sChange = sangPair.priceChange?.h24 ?? 0;
-        lines.push(
-          `$SANG: $${sPrice < 0.01 ? sPrice.toFixed(8) : sPrice.toFixed(4)} (${sChange >= 0 ? '+' : ''}${sChange.toFixed(2)}% 24h)`
-        );
-      }
-
-      if (!zabalPair && !sangPair) {
+      if (!zabalPair) {
         return { text: '', values: {}, data: {} };
       }
 
@@ -44,9 +33,8 @@ export const tokenDataProvider: Provider = {
         text: lines.join('\n'),
         values: {
           zabalPrice: zabalPair?.priceUsd ?? 'unavailable',
-          sangPrice: sangPair?.priceUsd ?? 'unavailable',
         },
-        data: { zabal: zabalPair ?? null, sang: sangPair ?? null },
+        data: { zabal: zabalPair ?? null },
       };
     } catch (err) {
       logger.error('Token data provider error:', err);

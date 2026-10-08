@@ -83,7 +83,7 @@ describe('Activity Tracker', () => {
 
   it('limits top topics to 10', () => {
     // Track messages mentioning many different keywords
-    for (const keyword of ['zabal', 'sang', 'songjam', 'wavewarz', 'clanker', 'empire',
+    for (const keyword of ['zabal', 'wavewarz', 'clanker', 'empire',
       'farcaster', 'base', 'ethereum', 'eth', 'fractal', 'incented']) {
       trackMessage('alice', `talking about ${keyword}`, 'ch-1');
     }
