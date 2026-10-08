@@ -67,7 +67,6 @@ describe('Integration: Character and Plugin', () => {
   it('character should reference ecosystem tokens', () => {
     const knowledge = character.knowledge?.join(' ') ?? '';
     expect(knowledge).toContain('ZABAL');
-    expect(knowledge).toContain('SANG');
     expect(knowledge).toContain('Base');
   });
 

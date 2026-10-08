@@ -11,7 +11,7 @@ import { formatActive } from '../formatters/active-formatter.ts';
 const SLASH_COMMANDS = [
   {
     name: 'price',
-    description: 'Get live token price data for ZABAL or SANG',
+    description: 'Get live token price data for ZABAL',
     options: [
       {
         name: 'token',
@@ -20,8 +20,6 @@ const SLASH_COMMANDS = [
         required: false,
         choices: [
           { name: 'ZABAL', value: 'zabal' },
-          { name: 'SANG', value: 'sang' },
-          { name: 'Both', value: 'both' },
         ],
       },
     ],
@@ -104,8 +102,8 @@ async function handleSlashCommand(interaction: any): Promise<void> {
 
     switch (commandName) {
       case 'price': {
-        const tokenChoice = interaction.options?.getString('token') ?? 'both';
-        const tokensToFetch = tokenChoice === 'both' ? ['ZABAL', 'SANG'] : [tokenChoice.toUpperCase()];
+        const tokenChoice = interaction.options?.getString('token') ?? 'zabal';
+        const tokensToFetch = [tokenChoice.toUpperCase()];
         const results: string[] = [];
 
         for (const key of tokensToFetch) {
@@ -162,7 +160,7 @@ async function handleSlashCommand(interaction: any): Promise<void> {
           'I am the signal amplifier, pattern recognizer, and relationship mapper for the ZABAL ecosystem.',
           '',
           '**Available Commands:**',
-          '`/price [token]` — Live price data for $ZABAL or $SANG',
+          '`/price [token]` — Live price data for $ZABAL',
           '`/recap [hours]` — Community activity recap',
           '`/active` — Who\'s been active recently',
           '`/empire` — Empire Builder metrics (treasury, burns, distributions)',
@@ -175,7 +173,6 @@ async function handleSlashCommand(interaction: any): Promise<void> {
           '',
           '**Ecosystem:**',
           '$ZABAL on Base — launched via Clanker v4 / Empire Builder',
-          '$SANG on Base — SongJam AI agent on Virtuals Protocol',
           'zabal.art — Creative hub & ecosystem portal',
         ].join('\n');
         break;

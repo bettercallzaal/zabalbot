@@ -81,7 +81,7 @@ export const recapAction: Action = {
       {
         name: '{{name2}}',
         content: {
-          text: '**Community Recap — Last 24h**\n\n**Farcaster Mentions** — 8 casts found\nActive casters:\n  - @songjam: 3 casts\n\n*Discord tracking builds over time — the longer I run, the richer the Discord data.*',
+          text: '**Community Recap — Last 24h**\n\n**Farcaster Mentions** — 8 casts found\nActive casters:\n  - @zabal: 3 casts\n\n*Discord tracking builds over time — the longer I run, the richer the Discord data.*',
           actions: ['COMMUNITY_RECAP'],
         },
       },

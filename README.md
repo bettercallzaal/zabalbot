@@ -7,7 +7,7 @@ ZABAL tracks contributions, maps relationships, and surfaces signal across platf
 ## What's Live Now
 
 ### Discord Bot + Web Chat
-- **Token tracking** — Live $ZABAL and $SANG prices via DexScreener
+- **Token tracking** — Live $ZABAL price via DexScreener
 - **Empire Builder** — Treasury, burns, distributions, leaderboard, boosters
 - **Farcaster monitoring** — Cast search, channel feeds, ecosystem mentions with deduplication
 - **Community recaps** — Multi-source activity summaries (Discord + Farcaster + Empire leaderboard)
@@ -134,7 +134,7 @@ Build a native miniapp that lives in Warpcast:
 - **Show notes** — Auto-post recap with key links, topics, action items
 - **Knowledge graph** — Map relationships between topics, contributors, and streams over time
 
-### Music & Creative (SongJam/SANG)
+### Music & Creative
 - **`/playlist`** — Community-curated playlist for streams
 - **Beat battles / WaveWarz** — Bracket competitions with community voting
 - **`/drops`** — Track NFT/music drops from community creators
@@ -175,7 +175,7 @@ src/
   tracker.ts            # In-memory activity tracker with memory caps
 
   actions/
-    token-info.ts       # TOKEN_INFO — live $ZABAL / $SANG price data via DexScreener
+    token-info.ts       # TOKEN_INFO — live $ZABAL price data via DexScreener
     empire-info.ts      # EMPIRE_INFO — treasury, burns, distributions from Empire Builder
     recap.ts            # COMMUNITY_RECAP — multi-source activity summary
     who-active.ts       # WHO_ACTIVE — cross-platform contributor pulse
@@ -205,13 +205,12 @@ src/
 | Token | Symbol | Chain | Address |
 |-------|--------|-------|---------|
 | ZABAL | $ZABAL | Base (8453) | `0xbB48f19B0494Ff7C1fE5Dc2032aeEE14312f0b07` |
-| SANG  | $SANG  | Base (8453) | `0x4FF4d349CAa028BD069bbE85fA05253f96176741` |
 
 ## Actions
 
 | Action | Trigger | Data Sources |
 |--------|---------|-------------|
-| `TOKEN_INFO` | "ZABAL price", "$SANG", "how is SANG trading" | DexScreener |
+| `TOKEN_INFO` | "ZABAL price", "$ZABAL market cap" | DexScreener |
 | `EMPIRE_INFO` | "empire stats", "treasury", "how much burned" | Empire Builder |
 | `COMMUNITY_RECAP` | "recap", "what did I miss", "catch me up" | Discord tracker + Farcaster + Empire leaderboard |
 | `WHO_ACTIVE` | "who's active", "active contributors", "community pulse" | Discord tracker + Farcaster |
@@ -220,7 +219,7 @@ src/
 
 | Command | Description |
 |---------|-------------|
-| `/price [token]` | Live price data for ZABAL, SANG, or both |
+| `/price [token]` | Live price data for ZABAL |
 | `/recap [hours]` | Multi-source community recap (1h–24h) |
 | `/active` | Cross-platform contributor pulse |
 | `/empire` | Empire Builder metrics |
@@ -303,7 +302,7 @@ Header: x-api-key: {EMPIRE_BUILDER_API_KEY}
 
 ### Neynar / Farcaster
 ```
-GET https://api.neynar.com/v2/farcaster/cast/search?q=zabal+OR+sang+OR+songjam&sort_type=algorithmic&limit=25
+GET https://api.neynar.com/v2/farcaster/cast/search?q=zabal&sort_type=algorithmic&limit=25
 GET https://api.neynar.com/v2/farcaster/feed/channels?channel_ids=zabal&limit=15
 Header: x-api-key: {FARCASTER_NEYNAR_API_KEY}
 ```
@@ -358,7 +357,6 @@ sdk.wallet.getEthereumProvider()  # EIP-1193 wallet
 ## Ecosystem
 
 - **$ZABAL** — Coordination intelligence token on Base, launched via Clanker v4 / Empire Builder
-- **$SANG** — SongJam AI agent token on Virtuals Protocol
 - **zabal.art** — Creative hub and ecosystem portal
 - **den.show** — Web3 livestreaming with creator tokens on Base
 - **Empire Builder** — 80% of trading fees to creator, leaderboard with boost multipliers
