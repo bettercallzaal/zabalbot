@@ -3,7 +3,7 @@ import type { HandlerCallback, Memory, State } from '@elizaos/core';
 import { v4 as uuidv4 } from 'uuid';
 import plugin from '../plugin';
 import { detectToken } from '../actions/token-info';
-import { clearActivity } from '../tracker';
+import { clearActivity, trackMessage } from '../tracker';
 
 function createMockMessage(text: string): Memory {
   return {
@@ -104,13 +104,14 @@ describe('COMMUNITY_RECAP Action', () => {
   });
 
   it('handler returns recap response when called', async () => {
+    // Seed the tracker so the test does not depend on live Farcaster/Empire data.
+    trackMessage('alice', 'shipped the new stream overlay', 'channel-1');
     const msg = createMockMessage('recap');
     let callbackText = '';
     const callback: HandlerCallback = async (response: any) => {
       callbackText = response.text;
     };
     await action.handler(mockRuntime, msg, mockState, {}, callback, []);
-    // With Farcaster/Empire data available, should return a recap (not necessarily empty)
     expect(callbackText.length).toBeGreaterThan(0);
     expect(callbackText).toContain('Recap');
   });
@@ -142,13 +143,13 @@ describe('WHO_ACTIVE Action', () => {
   });
 
   it('handler returns pulse response when called', async () => {
+    trackMessage('alice', 'shipped the new stream overlay', 'channel-1');
     const msg = createMockMessage("Who's active?");
     let callbackText = '';
     const callback: HandlerCallback = async (response: any) => {
       callbackText = response.text;
     };
     await action.handler(mockRuntime, msg, mockState, {}, callback, []);
-    // With Farcaster data available, should return a pulse (not necessarily empty)
     expect(callbackText.length).toBeGreaterThan(0);
     expect(callbackText).toContain('Pulse');
   });

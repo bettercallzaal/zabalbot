@@ -14,12 +14,6 @@ export const character: Character = {
     ...(process.env.OPENAI_API_KEY ? ['@elizaos/plugin-openai'] : []),
     ...(process.env.OLLAMA_API_ENDPOINT ? ['@elizaos/plugin-ollama'] : []),
     ...(process.env.GOOGLE_GENERATIVE_AI_API_KEY ? ['@elizaos/plugin-google-genai'] : []),
-    ...(!process.env.GOOGLE_GENERATIVE_AI_API_KEY &&
-    !process.env.OLLAMA_API_ENDPOINT &&
-    !process.env.OPENAI_API_KEY &&
-    !process.env.ANTHROPIC_API_KEY
-      ? ['@elizaos/plugin-local-ai']
-      : []),
 
     // Platform plugins
     ...(process.env.DISCORD_API_TOKEN ? ['@elizaos/plugin-discord'] : []),
@@ -34,6 +28,14 @@ export const character: Character = {
 
     // Bootstrap plugin
     ...(!process.env.IGNORE_BOOTSTRAP ? ['@elizaos/plugin-bootstrap'] : []),
+
+    // Local AI last: the fallback when no other AI provider is configured
+    ...(!process.env.GOOGLE_GENERATIVE_AI_API_KEY &&
+    !process.env.OLLAMA_API_ENDPOINT &&
+    !process.env.OPENAI_API_KEY &&
+    !process.env.ANTHROPIC_API_KEY
+      ? ['@elizaos/plugin-local-ai']
+      : []),
   ],
   settings: {
     secrets: {},
